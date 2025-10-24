@@ -118,6 +118,7 @@ Normalize our dataset.
 
 ```python
 import pandas as pd
+import sklearn
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -125,37 +126,69 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
 url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
-names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'Class']
-irisdata = pd.read_csv(url, names=names)
 
+# Takes first 4 columns and assign them to variable "X"
 X = irisdata.iloc[:, 0:4]
-y = irisdata['Class']
-
+# Takes first 5th columns and assign them to variable "Y". Object dtype refers to strings.
+y = irisdata.select_dtypes(include=[object])
+X.head()
+y.head()
+# y actually contains all categories or classes:
+y.Class.unique()
+# Now transforming categorial into numerical values
 le = preprocessing.LabelEncoder()
-y_encoded = le.fit_transform(y)
-
-X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.20, random_state=42)
-
+y = y.apply(le.fit_transform)
+y.head()
+# Now for train and test split (80% of  dataset into  training set and  other 20% into test data)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20)
+# Feature scaling
 scaler = StandardScaler()
 scaler.fit(X_train)
 X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
-
 mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10), max_iter=1000)
-mlp.fit(X_train, y_train)
-
+mlp.fit(X_train, y_train.values.ravel())
 predictions = mlp.predict(X_test)
+print(predictions)
+# Last thing: evaluation of algorithm performance in classifying flowers
+print(confusion_matrix(y_test,predictions))
+print(classification_report(y_test,predictions))
+```
+<H3>Output:</H3>
+<img width="639" height="299" alt="image" src="https://github.com/user-attachments/assets/1afe954a-30e8-41c0-9ca4-f22a93f37e7b" />
 
-flower_predictions = le.inverse_transform(predictions)
+<H3>Program:</H3>
 
 
-print(flower_predictions)  
-print(confusion_matrix(y_test, predictions))
-print(classification_report(y_test, predictions))
+```python
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
+arr = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Species']
+**Name:** ARJUN N S
+print(df.head())
+a = df.iloc[:, 0:4]
+b = df.select_dtypes(include=[object])
+b = df.iloc[:,4:5]
+training_a, testing_a, training_b, testing_b = train_test_split(a, b, test_size = 0.25)
+myscaler = StandardScaler()
+myscaler.fit(training_a)
+training_a = myscaler.transform(training_a)
+testing_a = myscaler.transform(testing_a)
+m1 = MLPClassifier(hidden_layer_sizes=(12, 13, 14), activation='relu', solver='adam', max_iter=2500)
+m1.fit(training_a, training_b.values.ravel())
+predicted_values = m1.predict(testing_a)
+print(confusion_matrix(testing_b,predicted_values))
+print(classification_report(testing_b,predicted_values))
 ```
 <H3>Output:</H3>
 
-<img width="1378" height="896" alt="image" src="https://github.com/user-attachments/assets/a4429ce3-4aa9-478d-ad45-4ccba09a7bb9" />
+<img width="680" height="425" alt="image" src="https://github.com/user-attachments/assets/9230479d-39be-438f-9456-e4f0fe62f6ff" />
 
 
 <H3>Result:</H3>

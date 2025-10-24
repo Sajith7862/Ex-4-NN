@@ -116,7 +116,7 @@ Normalize our dataset.
 
 <H3>Program:</H3> 
 
-```
+```python
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
@@ -124,43 +124,39 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
-url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data"
+url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
+names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'Class']
+irisdata = pd.read_csv(url, names=names)
 
-names = ["Class", "Alcohol", "Malic_acid", "Ash", "Magnesium"]
+X = irisdata.iloc[:, 0:4]
+y = irisdata['Class']
 
-winedata = pd.read_csv(url, names=names, usecols=[0, 1, 2, 3, 5])
-
-print(winedata.head())
-
-x = winedata.iloc[:, 1:]   # features
-y = winedata["Class"]      # labels
-
-# Encode labels
 le = preprocessing.LabelEncoder()
 y_encoded = le.fit_transform(y)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y_encoded, test_size=0.25, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.20, random_state=42)
 
 scaler = StandardScaler()
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
+scaler.fit(X_train)
+X_train = scaler.transform(X_train)
+X_test = scaler.transform(X_test)
 
-mlp = MLPClassifier(hidden_layer_sizes=(10,10,10), max_iter=1000, random_state=42)
-mlp.fit(x_train, y_train)
+mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10), max_iter=1000)
+mlp.fit(X_train, y_train)
 
-predictions = mlp.predict(x_test)
-predicted_classes = le.inverse_transform(predictions)
+predictions = mlp.predict(X_test)
 
-# Confusion matrix
+flower_predictions = le.inverse_transform(predictions)
+
+
+print(flower_predictions)  
 print(confusion_matrix(y_test, predictions))
-
-# Classification report with proper class labels
-print(classification_report(y_test, predictions, target_names=[f"Wine-Class-{c}" for c in le.classes_]))
+print(classification_report(y_test, predictions))
 ```
 <H3>Output:</H3>
 
-![img](https://github.com/Girithickrohan/Ex-4-NN/blob/main/Screenshot%202025-09-30%20112244.png)
+<img width="1378" height="896" alt="image" src="https://github.com/user-attachments/assets/a4429ce3-4aa9-478d-ad45-4ccba09a7bb9" />
+
 
 <H3>Result:</H3>
 Thus, MLP is implemented for multi-classification using python.
